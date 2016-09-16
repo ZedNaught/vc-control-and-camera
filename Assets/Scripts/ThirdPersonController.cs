@@ -8,12 +8,12 @@ public class ThirdPersonController : MonoBehaviour {
     UnityStandardAssets.Cameras.FreeLookCam cameraRig;
     Transform lookTarget;
 
-    [SerializeField]
-    PhysicMaterial zfriction;
+//    [SerializeField]
+    PhysicMaterial zeroFriction;
     //Zero Friction Physic Material (in 2D it's called Physics) we want zero friction when we move
 
-    [SerializeField]
-    PhysicMaterial mfriction;
+//    [SerializeField]
+    PhysicMaterial maxFriction;
     //Max Friction Physic Material (in 2D it's called Physics) but maximum friction when we are sationary
 
     Transform cam;
@@ -59,8 +59,25 @@ public class ThirdPersonController : MonoBehaviour {
         lookTarget = GameObject.FindGameObjectWithTag("LookTarget").transform;
         previousPosition = transform.position;
         currentMovementPoints = maxMovementPoints;
+
+        InitializePhysicMaterials();
     }
 
+    void InitializePhysicMaterials() {
+        maxFriction = new PhysicMaterial();
+        maxFriction.dynamicFriction = 1f;
+        maxFriction.staticFriction = 1f;
+        maxFriction.bounciness = 0f;
+        maxFriction.frictionCombine = PhysicMaterialCombine.Maximum;
+        maxFriction.bounceCombine = PhysicMaterialCombine.Average;
+
+        zeroFriction = new PhysicMaterial();
+        zeroFriction.dynamicFriction = 0f;
+        zeroFriction.staticFriction = 0f;
+        zeroFriction.bounciness = 0f;
+        zeroFriction.frictionCombine = PhysicMaterialCombine.Multiply;
+        zeroFriction.bounceCombine = PhysicMaterialCombine.Average;
+    }
 //    void TestAngleTransformTime() {
 //        int testIterations = 100000;
 //
@@ -208,10 +225,10 @@ public class ThirdPersonController : MonoBehaviour {
     void HandleFriction() {   //handles the friction physics for the character
         if (horizontalInput == 0 && verticalInput == 0) {
             //We are stationary so we want maximum friction.
-            capCol.material = mfriction;
+            capCol.material = maxFriction;
         } else {
             //We are moving, don't cause friction
-            capCol.material = zfriction;
+            capCol.material = zeroFriction;
         }
     }
 }
