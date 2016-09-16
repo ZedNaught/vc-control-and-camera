@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(Unit))]
 public class ThirdPersonController : MonoBehaviour {
 
     Rigidbody rigidBody;
@@ -7,6 +8,7 @@ public class ThirdPersonController : MonoBehaviour {
     Animator anim;
     UnityStandardAssets.Cameras.FreeLookCam cameraRig;
     Transform lookTarget;
+    Unit unit;
 
 //    [SerializeField]
     PhysicMaterial zeroFriction;
@@ -23,9 +25,9 @@ public class ThirdPersonController : MonoBehaviour {
     float runSpeed = 20f;
 //    float movementScalar = 100f;
 //    [SerializeField]
-    public float maxMovementPoints = 100f;
-    [HideInInspector]
-    public float currentMovementPoints;
+//    public float maxMovementPoints = 100f;
+//    [HideInInspector]
+//    public float currentMovementPoints;
 //    float currentSpeed;
     //How fast the player can move
     [SerializeField]
@@ -45,39 +47,40 @@ public class ThirdPersonController : MonoBehaviour {
     float horizontalInput;
     float verticalInput;
 //    bool jumpInput;
-    bool onGround;
+//    bool onGround;
     bool looking = false;
 
     void Start() {
         //Initialize references
-        rigidBody = GetComponent<Rigidbody>();
+//        rigidBody = GetComponent<Rigidbody>();
         cam = Camera.main.transform;
         cameraRig = cam.root.GetComponent<UnityStandardAssets.Cameras.FreeLookCam>();
-        capCol = GetComponent<CapsuleCollider>();
-        anim = GetComponent<Animator>();
-        onGround = true;    //The player starts out on the ground
+//        capCol = GetComponent<CapsuleCollider>();
+//        anim = GetComponent<Animator>();
+//        onGround = true;    //The player starts out on the ground
         lookTarget = GameObject.FindGameObjectWithTag("LookTarget").transform;
-        previousPosition = transform.position;
-        currentMovementPoints = maxMovementPoints;
+//        previousPosition = transform.position;
+//        currentMovementPoints = maxMovementPoints;
+        unit = GetComponent<Unit>();
 
-        InitializePhysicMaterials();
+//        InitializePhysicMaterials();
     }
 
-    void InitializePhysicMaterials() {
-        maxFriction = new PhysicMaterial();
-        maxFriction.dynamicFriction = 1f;
-        maxFriction.staticFriction = 1f;
-        maxFriction.bounciness = 0f;
-        maxFriction.frictionCombine = PhysicMaterialCombine.Maximum;
-        maxFriction.bounceCombine = PhysicMaterialCombine.Average;
-
-        zeroFriction = new PhysicMaterial();
-        zeroFriction.dynamicFriction = 0f;
-        zeroFriction.staticFriction = 0f;
-        zeroFriction.bounciness = 0f;
-        zeroFriction.frictionCombine = PhysicMaterialCombine.Multiply;
-        zeroFriction.bounceCombine = PhysicMaterialCombine.Average;
-    }
+//    void InitializePhysicMaterials() {
+//        maxFriction = new PhysicMaterial();
+//        maxFriction.dynamicFriction = 1f;
+//        maxFriction.staticFriction = 1f;
+//        maxFriction.bounciness = 0f;
+//        maxFriction.frictionCombine = PhysicMaterialCombine.Maximum;
+//        maxFriction.bounceCombine = PhysicMaterialCombine.Average;
+//
+//        zeroFriction = new PhysicMaterial();
+//        zeroFriction.dynamicFriction = 0f;
+//        zeroFriction.staticFriction = 0f;
+//        zeroFriction.bounciness = 0f;
+//        zeroFriction.frictionCombine = PhysicMaterialCombine.Multiply;
+//        zeroFriction.bounceCombine = PhysicMaterialCombine.Average;
+//    }
 //    void TestAngleTransformTime() {
 //        int testIterations = 100000;
 //
@@ -101,7 +104,7 @@ public class ThirdPersonController : MonoBehaviour {
     void Update() {
         HandleUpdateInput();
 //        Input.GetButton("Aim").
-        HandleFriction();
+//        HandleFriction();
     }
 
     void HandleUpdateInput() {
@@ -143,6 +146,7 @@ public class ThirdPersonController : MonoBehaviour {
         //Inputs
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
+        unit.walking = Input.GetButton("Walk");
         Vector3 camForwardInGroundPlane = Vector3.ProjectOnPlane(cam.forward, Vector3.up).normalized;
         Vector3 targetDirection;
         if (!looking || previousTargetDirection == Vector3.zero)
@@ -152,7 +156,6 @@ public class ThirdPersonController : MonoBehaviour {
 //        jumpInput = Input.GetButtonDown("Jump");
         // place "look" target in camera's forward direction from player's position
         lookTarget.position = transform.position + camForwardInGroundPlane.normalized;
-        
 
         /*
             This if statment is how tolerant we are on changing the direction based on where the camera is looking.
@@ -161,74 +164,80 @@ public class ThirdPersonController : MonoBehaviour {
         */
 //        storDir = cam.right;        //This means, the player can keep moving in the same direction they were before even if they change the camera angle
 
-        // handle forward movement and jumping, does not rotate
-        if (onGround) { 
-//            Vector3 targ
-            float currentSpeed = currentMovementPoints > 0 ? (Input.GetButton("Walk") ? walkSpeed : runSpeed) : 0f;
-            if (currentSpeed > 0) {
-                rigidBody.AddForce(targetDirection * currentSpeed);
-            }
-            anim.SetFloat("Speed", rigidBody.velocity.magnitude);
-
-            //Jump controls
-//            if (jumpInput && onGround)
-//            {
-//                rigidBody.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);      //ForceMode.Impulse (I think) gives all the force to the jump for only one frame.
+//        // handle forward movement and jumping, does not rotate
+//        if (onGround) { 
+////            Vector3 targ
+//            float currentSpeed = currentMovementPoints > 0 ? (Input.GetButton("Walk") ? walkSpeed : runSpeed) : 0f;
+//            if (currentSpeed > 0) {
+//                rigidBody.AddForce(targetDirection * currentSpeed);
 //            }
-        }
+//            anim.SetFloat("Speed", rigidBody.velocity.magnitude);
+//
+//            //Jump controls
+////            if (jumpInput && onGround)
+////            {
+////                rigidBody.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);      //ForceMode.Impulse (I think) gives all the force to the jump for only one frame.
+////            }
+//        }
 
         // rotate appropriately if the player has given input
+        Quaternion targetRotation;
         if (horizontalInput != 0 || verticalInput != 0) {
-            Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+            targetRotation = Quaternion.LookRotation(targetDirection);
             // find the angle (in range [-180, 180]) between the character's rotation and where the camera is looking
-            float targetRotationAngle = WrapAnglePlusMinus180(targetRotation.eulerAngles.y - transform.rotation.eulerAngles.y);
-
-            float turnAnimationMagnitude;  // holds value to send to animator for "turning" animation
-            // if angle is not zero (to avoid a warning), look towards the camera
-            float animationDirection = Mathf.Clamp(targetRotationAngle, -45f, 45f) / 45f;
-            if (targetRotationAngle != 0) {
-                rigidBody.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime);
-                turnAnimationMagnitude = Mathf.LerpAngle(anim.GetFloat("Direction"), animationDirection, animDirectionChangeSpeed * Time.fixedDeltaTime);
-            }
-            else {
-                turnAnimationMagnitude = Mathf.LerpAngle(anim.GetFloat("Direction"), 0f, animDirectionChangeSpeed * Time.fixedDeltaTime);
-            }
-            anim.SetFloat("Direction", turnAnimationMagnitude);
+//            float targetRotationAngle = WrapAnglePlusMinus180(targetRotation.eulerAngles.y - transform.rotation.eulerAngles.y);
+//
+//            float turnAnimationMagnitude;  // holds value to send to animator for "turning" animation
+//            // if angle is not zero (to avoid a warning), look towards the camera
+//            float animationDirection = Mathf.Clamp(targetRotationAngle, -45f, 45f) / 45f;
+//            if (targetRotationAngle != 0) {
+//                rigidBody.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime);
+//                turnAnimationMagnitude = Mathf.LerpAngle(anim.GetFloat("Direction"), animationDirection, animDirectionChangeSpeed * Time.fixedDeltaTime);
+//            }
+//            else {
+//                turnAnimationMagnitude = Mathf.LerpAngle(anim.GetFloat("Direction"), 0f, animDirectionChangeSpeed * Time.fixedDeltaTime);
+//            }
+//            anim.SetFloat("Direction", turnAnimationMagnitude);
         }
+        else {
+            targetRotation = transform.rotation;
+        }
+
+        unit.HandleMovement(targetDirection, targetRotation);
 
         previousTargetDirection = targetDirection;
-        float amountMoved = (transform.position - previousPosition).magnitude;
-        currentMovementPoints = Mathf.Max(0f, currentMovementPoints - amountMoved);
-        previousPosition = transform.position;
+//        float amountMoved = (transform.position - previousPosition).magnitude;
+//        currentMovementPoints = Mathf.Max(0f, currentMovementPoints - amountMoved);
+//        previousPosition = transform.position;
     }
 
-    //If we are touching something (like the ground )
-    void OnCollisionEnter(Collision other) {
-        //This means we are on the ground
-
-        if (other.gameObject.tag == "Ground") {
-            onGround = true;
-            rigidBody.drag = 5;
-        }
-    }
-
-    //Once we are no longer touching the object we collided with earlier
-    void OnCollisionExit(Collision other) {
-        //We want to know when we have left the ground (or anything else)
-        if (other.gameObject.tag == "Ground") {    //You can copy this if statement and make it "Vehicle" or something to jump off a car.
-            onGround = false;
-            rigidBody.drag = 0;
-        }
-    }
-
-
-    void HandleFriction() {   //handles the friction physics for the character
-        if (horizontalInput == 0 && verticalInput == 0) {
-            //We are stationary so we want maximum friction.
-            capCol.material = maxFriction;
-        } else {
-            //We are moving, don't cause friction
-            capCol.material = zeroFriction;
-        }
-    }
+//    //If we are touching something (like the ground )
+//    void OnCollisionEnter(Collision other) {
+//        //This means we are on the ground
+//
+//        if (other.gameObject.tag == "Ground") {
+//            onGround = true;
+//            rigidBody.drag = 5;
+//        }
+//    }
+//
+//    //Once we are no longer touching the object we collided with earlier
+//    void OnCollisionExit(Collision other) {
+//        //We want to know when we have left the ground (or anything else)
+//        if (other.gameObject.tag == "Ground") {    //You can copy this if statement and make it "Vehicle" or something to jump off a car.
+//            onGround = false;
+//            rigidBody.drag = 0;
+//        }
+//    }
+//
+//
+//    void HandleFriction() {   //handles the friction physics for the character
+//        if (horizontalInput == 0 && verticalInput == 0) {
+//            //We are stationary so we want maximum friction.
+//            capCol.material = maxFriction;
+//        } else {
+//            //We are moving, don't cause friction
+//            capCol.material = zeroFriction;
+//        }
+//    }
 }
