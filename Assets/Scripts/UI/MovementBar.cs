@@ -3,26 +3,57 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class MovementBar : MonoBehaviour {
-    public Unit unit;
     RectTransform rectTransform;
     float initialWidth;
+    bool barActive = false;
+    WaitForSeconds pollingIntervalSeconds = new WaitForSeconds(.1f);
+    public static MovementBar instance;
+
+    void Awake() {
+        if (instance == null) {
+            instance = this;
+        }
+        else if (instance != this) {
+            Destroy(gameObject);
+            return;
+        }
+    }
 
     void Start() {
-//        movementScript = GameObject.FindGameObjectWithTag("Player").GetComponent<ThirdPersonController>();
-        unit = GameManager.instance.activeUnit.GetComponent<Unit>();
         rectTransform = GetComponent<RectTransform>();
         initialWidth = rectTransform.rect.width;
     }
 
-    void Update() {
-        if (unit == null) {
-            transform.parent.gameObject.SetActive(false);
-            Debug.Log("deactivating movement bar");
-            return;
+//    void OnDestroy() {
+//        instance.StopCoroutine("TrackUnitMovement");
+//    }
+
+    public static void ActivateBar() {
+        instance.barActive = true;
+        instance.transform.parent.gameObject.SetActive(true);
+        instance.StartCoroutine("TrackUnitMovement");
+    }
+
+    public static void DeactivateBar(bool stopCoroutine=true) {
+        instance.barActive = false;
+        instance.transform.parent.gameObject.SetActive(false);
+        instance.StopCoroutine("TrackUnitMovement");
+    }
+
+    IEnumerator TrackUnitMovement() {
+        while (true) {
+            if (GameManager.instance.ActiveUnit != null) {
+                if (!barActive)
+                    ActivateBar();
+                Unit unit = GameManager.instance.ActiveUnit;
+                float pctMovementRemaining = unit.currentMovementPoints / unit.maxMovementPoints;
+                float desiredWidth = pctMovementRemaining * initialWidth;
+                rectTransform.sizeDelta = new Vector2(desiredWidth, rectTransform.rect.height);
+            }
+            else if (barActive) {
+                DeactivateBar();
+            }
+            yield return pollingIntervalSeconds;
         }
-        float pctMovementRemaining = unit.currentMovementPoints / unit.maxMovementPoints;
-        float desiredWidth = pctMovementRemaining * initialWidth;
-//        float deltaWidth = desiredWidth - rectTransform.rect.width;
-        rectTransform.sizeDelta = new Vector2(desiredWidth, rectTransform.rect.height);
     }
 }
