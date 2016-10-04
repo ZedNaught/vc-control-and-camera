@@ -42,10 +42,10 @@ public class MovementBar : MonoBehaviour {
 
     IEnumerator TrackUnitMovement() {
         while (true) {
-            if (GameManager.instance.ActiveUnit != null) {
+            if (ThirdPersonController.ActiveUnit != null) {
                 if (!barActive)
                     ActivateBar();
-                Unit unit = GameManager.instance.ActiveUnit;
+                Unit unit = ThirdPersonController.ActiveUnit;
                 float pctMovementRemaining = unit.currentMovementPoints / unit.maxMovementPoints;
                 float desiredWidth = pctMovementRemaining * initialWidth;
                 rectTransform.sizeDelta = new Vector2(desiredWidth, rectTransform.rect.height);

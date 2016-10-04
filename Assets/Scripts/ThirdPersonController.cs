@@ -5,9 +5,9 @@ public class ThirdPersonController : MonoBehaviour {
     Rigidbody rigidBody;
     CapsuleCollider capCol;
     Animator anim;
-    UnityStandardAssets.Cameras.FreeLookCam cameraRig;
+    static UnityStandardAssets.Cameras.FreeLookCam cameraRig;
+    static Transform cam;
     Transform lookTarget;
-    Transform cam;
     Unit unit;
 
     float horizontalInput;
@@ -16,9 +16,39 @@ public class ThirdPersonController : MonoBehaviour {
     bool walking = false;
     Vector3 previousTargetDirection = new Vector3();
 
+    static Unit _activeUnit;
+    public static Unit ActiveUnit {
+        get {
+            return _activeUnit;
+        }
+        set {
+            if (_activeUnit != null) {
+                _activeUnit.gameObject.GetComponent<ThirdPersonController>().enabled = false;
+                _activeUnit.StopMovement();
+                _activeUnit.gameObject.tag = "FriendlyUnit";
+            }
+            _activeUnit = value;
+            if (_activeUnit != null) {
+                _activeUnit.gameObject.GetComponent<ThirdPersonController>().enabled = true;
+                cameraRig.SetTarget(_activeUnit.transform);
+                MovementBar.ActivateBar();
+                _activeUnit.gameObject.tag = "Player";
+            }
+            else {
+                cameraRig.SetTarget(GameManager.instance.transform);
+                MovementBar.DeactivateBar();
+            }
+        }
+    }
+
+    void Awake() {
+        if (enabled) {
+            cameraRig = GameManager.freeLookCamRig;
+            cam = cameraRig.gameObject.GetComponentInChildren<Camera>().transform;
+        }
+    }
+
     void Start() {
-        cam = Camera.main.transform;
-        cameraRig = cam.root.GetComponent<UnityStandardAssets.Cameras.FreeLookCam>();
         lookTarget = GameObject.FindGameObjectWithTag("LookTarget").transform;
         unit = GetComponent<Unit>();
     }
@@ -40,8 +70,9 @@ public class ThirdPersonController : MonoBehaviour {
         if (Input.GetButtonDown("NextUnit")) {
             int indexJump = Input.GetButton("PrevUnitModifier") ? (Unit.friendlyUnits.Count - 1) : 1;
             int nextUnitIndex = (indexJump + Unit.friendlyUnits.IndexOf(unit)) % Unit.friendlyUnits.Count;
+//            Debug.Log(nextUnitIndex);
             Unit nextUnit = Unit.friendlyUnits[nextUnitIndex];
-            GameManager.instance.ActiveUnit = nextUnit;
+            ThirdPersonController.ActiveUnit = nextUnit;
         }
     }
 

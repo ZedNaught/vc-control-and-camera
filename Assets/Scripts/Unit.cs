@@ -23,6 +23,7 @@ public class Unit : MonoBehaviour {
     Vector3 previousPosition;
 
     public static List<Unit> friendlyUnits = new List<Unit>();
+    public static List<Unit> allUnits = new List<Unit>();
 
     void Start() {
         _rigidbody = GetComponent<Rigidbody>();
@@ -31,6 +32,7 @@ public class Unit : MonoBehaviour {
         previousPosition = transform.position;
         currentMovementPoints = maxMovementPoints;
 
+        allUnits.Add(this);
         if (gameObject.tag == "Player" || gameObject.tag == "FriendlyUnit")
             friendlyUnits.Add(this);
 

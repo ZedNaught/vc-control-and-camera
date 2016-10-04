@@ -3,34 +3,8 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
     public static GameManager instance;
-    UnityStandardAssets.Cameras.FreeLookCam cameraRig;
-    Transform mainCamera;
-
-    [SerializeField] Unit _activeUnit;
-    public Unit ActiveUnit {
-        get {
-            return _activeUnit;
-        }
-        set {
-            if (_activeUnit != null) {
-                _activeUnit.gameObject.GetComponent<ThirdPersonController>().enabled = false;
-                _activeUnit.StopMovement();
-                _activeUnit.gameObject.tag = "FriendlyUnit";
-            }
-            _activeUnit = value;
-            if (_activeUnit != null) {
-                Debug.Log(_activeUnit);
-                _activeUnit.gameObject.GetComponent<ThirdPersonController>().enabled = true;
-                cameraRig.SetTarget(_activeUnit.transform);
-                MovementBar.ActivateBar();
-                _activeUnit.gameObject.tag = "Player";
-            }
-            else {
-                cameraRig.SetTarget(instance.transform);
-                MovementBar.DeactivateBar();
-            }
-        }
-    }
+//    Transform mainCamera;
+    public static UnityStandardAssets.Cameras.FreeLookCam freeLookCamRig;
 
     void Awake() {
         if (instance == null) {
@@ -41,11 +15,11 @@ public class GameManager : MonoBehaviour {
             return;
         }
 
-        mainCamera = Camera.main.transform;
-        cameraRig = mainCamera.root.GetComponent<UnityStandardAssets.Cameras.FreeLookCam>();
+//        mainCamera = Camera.main.transform;
+//        freeLookCamRig = GameObject.FindGameObjectWithTag("FreeLookCamRig").GetComponent<UnityStandardAssets.Cameras.FreeLookCam>();
     }
 
     void Start() {
-        ActiveUnit = GameObject.FindGameObjectWithTag("Player").GetComponent<Unit>();
+//        ThirdPersonController.ActiveUnit = GameObject.FindGameObjectWithTag("Player").GetComponent<Unit>();
     }
 }

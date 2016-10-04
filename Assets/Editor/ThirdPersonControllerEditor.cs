@@ -2,24 +2,24 @@
 using System.Collections;
 using UnityEditor;
 
-[CustomEditor(typeof(GameManager))]
+[CustomEditor(typeof(ThirdPersonController))]
 public class GameManagerEditor : Editor {
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
 
         if (GUILayout.Button("Set Target to null")) {
-            GameManager.instance.ActiveUnit = null;
+            ThirdPersonController.ActiveUnit = null;
         }
 
         if (GUILayout.Button("Set Target to Player")) {
             Unit player = GameObject.FindGameObjectWithTag("Player").GetComponent<Unit>();
-            GameManager.instance.ActiveUnit = player;
+            ThirdPersonController.ActiveUnit = player;
         }
 
         if (GUILayout.Button("Set Target to FriendlyUnit")) {
             Unit player = GameObject.FindGameObjectWithTag("FriendlyUnit").GetComponent<Unit>();
-            GameManager.instance.ActiveUnit = player;
+            ThirdPersonController.ActiveUnit = player;
         }
     }
 }

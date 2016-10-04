@@ -7,6 +7,8 @@ TagManager:
   - Ground
   - LookTarget
   - FriendlyUnit
+  - FreeLookCamRig
+  - OverviewCamRig
   layers:
   - Default
   - TransparentFX
