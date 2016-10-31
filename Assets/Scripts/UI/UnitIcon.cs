@@ -16,6 +16,8 @@ public class UnitIcon : MonoBehaviour {
         iconImage = GetComponentInChildren<Image>();
         rectTransform = GetComponent<RectTransform>();
 	}
+
+
 	
 	void Update () {
         Vector3 screenPoint = overviewCam.WorldToScreenPoint(Unit.position);

@@ -21,22 +21,35 @@ public class Unit : MonoBehaviour {
     [HideInInspector] public float currentMovementPoints;
 
     Vector3 previousPosition;
+    float turnAnimationMagnitude;
 
-    public static List<Unit> friendlyUnits = new List<Unit>();
+    public static List<Unit> FriendlyUnits {
+        get {
+            List<Unit> friendlyUnits = new List<Unit>();
+            foreach (Unit unit in allUnits) {
+                if (unit.IsFriendly()) {
+                    friendlyUnits.Add(unit);
+                }
+            }
+            return friendlyUnits;
+        }
+    }
     public static List<Unit> allUnits = new List<Unit>();
 
-    void Start() {
+    void Awake() {
         _rigidbody = GetComponent<Rigidbody>();
         _collider = GetComponent<CapsuleCollider>();
         anim = GetComponent<Animator>();
         previousPosition = transform.position;
         currentMovementPoints = maxMovementPoints;
-
+    }
+    void Start() {
         allUnits.Add(this);
-        if (gameObject.tag == "Player" || gameObject.tag == "FriendlyUnit")
-            friendlyUnits.Add(this);
-
         InitializePhysicMaterials();
+    }
+
+    void FixedUpdate() {
+        
     }
 
     void InitializePhysicMaterials() {
@@ -57,6 +70,7 @@ public class Unit : MonoBehaviour {
 
     void Update() {
         UpdateFriction();
+        HandleAnimation();
     }
 
     float WrapAnglePlusMinus180(float a) {
@@ -82,24 +96,26 @@ public class Unit : MonoBehaviour {
         else {
             currentMovementType = MovementType.Stopped;
         }
-        anim.SetFloat("Speed", _rigidbody.velocity.magnitude);
 
         // rotational movement - Slerp between current rotation and target rotation
         float targetRotationAngle = WrapAnglePlusMinus180(targetRotation.eulerAngles.y - transform.rotation.eulerAngles.y);
         // map angle to range [-1, 1] to determine 
         float animationDirection = Mathf.Clamp(targetRotationAngle, -45f, 45f) / 45f;
         // holds value to send to animator for "turning" animation
-        float turnAnimationMagnitude;
         if (targetRotationAngle != 0) {
             _rigidbody.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime);
             turnAnimationMagnitude = Mathf.LerpAngle(anim.GetFloat("Direction"), animationDirection, animDirectionChangeSpeed * Time.fixedDeltaTime);
-            anim.SetFloat("Direction", turnAnimationMagnitude);
         }
 
         // movement point accounting
         float amountMoved = (transform.position - previousPosition).magnitude;
         UseMovementPoints(amountMoved);
         previousPosition = transform.position;
+    }
+
+    void HandleAnimation() {
+        anim.SetFloat("Speed", _rigidbody.velocity.magnitude);
+        anim.SetFloat("Direction", turnAnimationMagnitude);
     }
 
     public void StopMovement() {
@@ -131,5 +147,9 @@ public class Unit : MonoBehaviour {
         } else {
             _collider.material = zeroFriction;
         }
+    }
+
+    bool IsFriendly() {
+        return (tag == "FriendlyUnit" || tag == "Player");
     }
 }

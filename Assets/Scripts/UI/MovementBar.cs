@@ -7,19 +7,16 @@ public class MovementBar : MonoBehaviour {
     float initialWidth;
     bool barActive = false;
     WaitForSeconds pollingIntervalSeconds = new WaitForSeconds(.1f);
-    public static MovementBar instance;
+    public static MovementBar Instance {get; set;}
 
     void Awake() {
-        if (instance == null) {
-            instance = this;
+        if (Instance == null) {
+            Instance = this;
         }
-        else if (instance != this) {
+        else if (Instance != this) {
             Destroy(gameObject);
             return;
         }
-    }
-
-    void Start() {
         rectTransform = GetComponent<RectTransform>();
         initialWidth = rectTransform.rect.width;
     }
@@ -28,16 +25,16 @@ public class MovementBar : MonoBehaviour {
 //        instance.StopCoroutine("TrackUnitMovement");
 //    }
 
-    public static void ActivateBar() {
-        instance.barActive = true;
-        instance.transform.parent.gameObject.SetActive(true);
-        instance.StartCoroutine("TrackUnitMovement");
+    public void ActivateBar() {
+        barActive = true;
+        transform.parent.gameObject.SetActive(true);
+        StartCoroutine("TrackUnitMovement");
     }
 
-    public static void DeactivateBar(bool stopCoroutine=true) {
-        instance.barActive = false;
-        instance.transform.parent.gameObject.SetActive(false);
-        instance.StopCoroutine("TrackUnitMovement");
+    public void DeactivateBar(bool stopCoroutine=true) {
+        barActive = false;
+        transform.parent.gameObject.SetActive(false);
+        StopCoroutine("TrackUnitMovement");
     }
 
     IEnumerator TrackUnitMovement() {
